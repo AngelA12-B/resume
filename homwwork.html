@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="form-container">
+        <form id="userForm">
+            <label>First Name: <input type="text" id="firstName" required></label>
+            <label>Last Name: <input type="text" id="lastName" required></label>
+            <label>Email: <input type="email" id="email" required></label>
+            <label>Age: <input type="number" id="age" min="0" required></label>
+            <label>Phone: <input type="text" id="phone" required></label>
+            <label>Username: <input type="text" id="username" required></label>
+            <label>Password: <input type="password" id="password" required></label>
+            <label>Confirm Password: <input type="password" id="confirmPassword" required></label>
+            <button type="button" id="submitBtn">Submit Query</button>
+        </form>
+        <div id="output"></div>
+    </div>
+    <script>
+      document.getElementById("submitBtn").addEventListener("click", function () {
+    const firstName = document.getElementById("firstName").value;
+    const lastName = document.getElementById("lastName").value;
+    const email = document.getElementById("email").value;
+    const age = document.getElementById("age").value;
+    const phone = document.getElementById("phone").value;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    let outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = `
+        <p>${firstName} ${lastName}</p>
+        <p>${email}</p>
+        <p>${phone}</p>
+        <p>${age}</p>
+    `;
+
+    if (password === confirmPassword) {
+        outputDiv.innerHTML += `<p style="color: green;">Passwords match</p>`;
+    } else {
+        outputDiv.innerHTML += `<p style="color: red;">Passwords do not match</p>`;
+    }
+});
+
+    </script>
+    <script src="script.js"></script>
+  <style>
+
+    body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.form-container {
+    width: 400px;
+    margin: auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+form input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#output {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+  </style>
+</body>
+</html>

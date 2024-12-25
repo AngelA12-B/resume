@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-gap: 0;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .cell.black {
+            background-color: #769656;
+        }
+        .cell.white {
+            background-color: #eeeed2;
+        }
+        .piece {
+            cursor: pointer;
+            font-size: 40px;
+            color: black;
+        }
+        .piece.black {
+            color: black;
+        }
+        .piece.white {
+            color: white;
+            text-shadow: 0 0 2px #000;
+        }
+        .selected {
+            outline: 3px solid yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameBoard"></div>
+
+    <script>
+        const gameBoard = document.getElementById('gameBoard');
+
+        // Unicode chess pieces
+        const pieceSymbols = {
+            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙',
+            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟'
+        };
+
+        // Initialize chess board
+        const board = Array(8).fill(null).map(() => Array(8).fill(null));
+        const initialSetup = [
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ...Array(4).fill(Array(8).fill(null)),
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
+        ];
+
+        let currentPlayer = 'white';
+        let selectedPiece = null;
+        let selectedPosition = null;
+
+        // Render the chess board
+        function renderBoard() {
+            gameBoard.innerHTML = '';
+            board.forEach((row, rowIndex) => {
+                row.forEach((cell, colIndex) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.classList.add('cell', (rowIndex + colIndex) % 2 === 0 ? 'white' : 'black');
+                    cellDiv.addEventListener('click', () => handleCellClick(rowIndex, colIndex));
+                    if (cell) {
+                        const piece = document.createElement('span');
+                        piece.textContent = pieceSymbols[cell];
+                        piece.classList.add('piece', cell === cell.toLowerCase() ? 'black' : 'white');
+                        if (selectedPiece && rowIndex === selectedPosition[0] && colIndex === selectedPosition[1]) {
+                            piece.classList.add('selected');
+                        }
+                        cellDiv.appendChild(piece);
+                    }
+                    gameBoard.appendChild(cellDiv);
+                });
+            });
+        }
+
+        // Handle cell click
+        function handleCellClick(row, col) {
+            if (selectedPiece) {
+                movePiece(row, col);
+            } else if (board[row][col] && isCurrentPlayerPiece(row, col)) {
+                selectPiece(row, col);
+            }
+        }
+
+        // Check if the piece belongs to the current player
+        function isCurrentPlayerPiece(row, col) {
+            const piece = board[row][col];
+            return (currentPlayer === 'white' && piece === piece.toUpperCase()) ||
+                   (currentPlayer === 'black' && piece === piece.toLowerCase());
+        }
+
+        // Select a piece
+        function selectPiece(row, col) {
+            selectedPiece = board[row][col];
+            selectedPosition = [row, col];
+            renderBoard();
+        }
+
+        // Move the selected piece
+        function movePiece(row, col) {
+            if (selectedPiece && isValidMove(row, col)) {
+                board[selectedPosition[0]][selectedPosition[1]] = null;
+                board[row][col] = selectedPiece;
+                selectedPiece = null;
+                selectedPosition = null;
+                currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                renderBoard();
+            }
+        }
+
+        // Check if the move is valid for the selected piece
+        function isValidMove(row, col) {
+            const [currentRow, currentCol] = selectedPosition;
+            const piece = selectedPiece;
+
+            if (piece.toLowerCase() === 'p') { // Pawn movement
+                const direction = piece === 'P' ? -1 : 1;
+                const startRow = piece === 'P' ? 6 : 1;
+
+                if (col === currentCol && board[row][col] === null) {
+                    // Move forward one space
+                    if (row === currentRow + direction) return true;
+                    // Move forward two spaces on first move
+                    if (currentRow === startRow && row === currentRow + 2 * direction && board[currentRow + direction][col] === null) return true;
+                }
+                // Capture diagonally
+                if (Math.abs(col - currentCol) === 1 && row === currentRow + direction && board[row][col] !== null) return true;
+            }
+
+            if (piece.toLowerCase() === 'n') { // Knight movement
+                const rowDiff = Math.abs(row - currentRow);
+                const colDiff = Math.abs(col - currentCol);
+                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+            }
+
+            // Add additional rules for other pieces later
+
+            return false;
+        }
+
+        // Initialize board
+        function initializeBoard() {
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    board[i][j] = initialSetup[i][j];
+                }
+            }
+            renderBoard();
+        }
+
+        initializeBoard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angel Almonte - Software Engineer Projects</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #0044cc;
+            color: white;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+        header p {
+            margin: 0;
+            font-size: 18px;
+        }
+        .projects {
+            margin: 20px 0;
+        }
+        .project {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .project h2 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            color: #0044cc;
+        }
+        .project p {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+        .project a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #0044cc;
+            font-weight: bold;
+        }
+        .project a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+            background-color: #333;
+            color: white;
+        }
+
+        /* Tic Tac Toe Styling */
+        .tic-tac-toe {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            max-width: 320px;
+        }
+        .tic-tac-toe div {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            border: 2px solid #333;
+            background-color: #f2f2f2;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tic-tac-toe div.taken {
+            pointer-events: none;
+        }
+        .winner {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: green;
+        }
+
+        /* Chess Styling */
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-gap: 0;
+            margin: 40px auto;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .cell.black {
+            background-color: #769656;
+        }
+        .cell.white {
+            background-color: #eeeed2;
+        }
+        .piece {
+            cursor: pointer;
+            font-size: 40px;
+            color: black;
+        }
+        .piece.black {
+            color: black;
+        }
+        .piece.white {
+            color: white;
+            text-shadow: 0 0 2px #000;
+        }
+        .selected {
+            outline: 3px solid yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Angel Almonte</h1>
+            <p>Software Engineer | Lehman College | Pursuing a BS in Computer Science</p>
+        </header>
+
+        <section class="projects">
+            <h2>My Projects</h2>
+
+            <!-- Tic Tac Toe Section -->
+            <div class="project">
+                <h2>Project 1: Tic Tac Toe Game</h2>
+                <p>
+                    Built a fully functional Tic Tac Toe game where users can play against each other.
+                    It keeps track of the state of the game, checks for winners, and resets the board when the game is over.
+                </p>
+                <div class="tic-tac-toe" id="ticTacToe">
+                    <div data-index="0"></div>
+                    <div data-index="1"></div>
+                    <div data-index="2"></div>
+                    <div data-index="3"></div>
+                    <div data-index="4"></div>
+                    <div data-index="5"></div>
+                    <div data-index="6"></div>
+                    <div data-index="7"></div>
+                    <div data-index="8"></div>
+                </div>
+                <p class="winner" id="winner"></p>
+                <button id="resetButton" style="display:none;">Reset Game</button>
+            </div>
+
+            <!-- Chess Section -->
+            <div class="project">
+                <h2>Project 2: Chess Game</h2>
+                <p>
+                    A fully interactive chess game where users can play against each other. The board renders pieces using Unicode symbols, and players can select and move pieces based on the rules of chess.
+                </p>
+                <div class="game-container" id="gameBoard"></div>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 Angel Almonte. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Tic Tac Toe Game ---
+        const cells = document.querySelectorAll('.tic-tac-toe div');
+        const board = ['', '', '', '', '', '', '', '', ''];
+        let currenPlayer = 'X';
+        let isGameOver = false;
+        const winnerText = document.getElementById('winner');
+        const resetButton = document.getElementById('resetButton');
+
+        // Handle cell click
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                const index = cell.getAttribute('data-index');
+                
+                if (board[index] || isGameOver) return;  // If the cell is already taken or game is over, do nothing
+
+                // Update the board and the cell content
+                board[index] = currentPlayer;
+                cell.textContent = currentPlayer;
+                cell.classList.add('taken');
+
+                // Check if there's a winner
+                if (checkWinner()) {
+                    winnerText.textContent = `${currentPlayer} wins!`;
+                    isGameOver = true;
+                    resetButton.style.display = 'block';
+                    return;
+                }
+
+                // Check if it's a draw
+                if (board.every(cell => cell !== '')) {
+                    winnerText.textContent = "It's a draw!";
+                    isGameOver = true;
+                    resetButton.style.display = 'block';
+                    return;
+                }
+
+                // Switch player
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            });
+        });
+
+        // Check for winner
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+
+            return winPatterns.some(pattern => {
+                const [a, b, c] = pattern;
+                return board[a] && board[a] === board[b] && board[a] === board[c];
+            });
+        }
+
+        // Reset the game
+        resetButton.addEventListener('click', () => {
+            board.fill('');
+            currentPlayer = 'X';
+            isGameOver = false;
+            winnerText.textContent = '';
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('taken');
+            });
+            resetButton.style.display = 'none';
+        });
+
+        // --- Chess Game ---
+        const gameBoard = document.getElementById('gameBoard');
+        const pieceSymbols = {
+            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙',
+            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟'
+        };
+
+        const boardState = Array(8).fill(null).map(() => Array(8).fill(null));
+        const initialSetup = [
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ...Array(4).fill(Array(8).fill(null)),
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
+        ];
+
+        let currentPlayer = 'white';
+        let selectedPiece = null;
+        let selectedPosition = null;
+
+        // Render the chess board
+        function renderBoard() {
+            gameBoard.innerHTML = '';
+            boardState.forEach((row, rowIndex) => {
+                row.forEach((cell, colIndex) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.classList.add('cell', (rowIndex + colIndex) % 2 === 0 ? 'white' : 'black');
+                    cellDiv.addEventListener('click', () => handleCellClick(rowIndex, colIndex));
+                    if (cell) {
+                        const piece = document.createElement('span');
+                        piece.textContent = pieceSymbols[cell];
+                        piece.classList.add('piece', cell === cell.toLowerCase() ? 'black' : 'white');
+                        if (selectedPiece && rowIndex === selectedPosition[0] && colIndex === selectedPosition[1]) {
+                            piece.classList.add('selected');
+                        }
+                        cellDiv.appendChild(piece);
+                    }
+                    gameBoard.appendChild(cellDiv);
+                });
+            });
+        }
+
+        // Handle cell click
+        function handleCellClick(row, col) {
+            if (selectedPiece) {
+                movePiece(row, col);
+            } else if (boardState[row][col] && isCurrentPlayerPiece(row, col)) {
+                selectPiece(row, col);
+            }
+        }
+
+        // Check if the piece belongs to the current player
+        function isCurrentPlayerPiece(row, col) {
+            const piece = boardState[row][col];
+            return (currentPlayer === 'white' && piece === piece.toUpperCase()) ||
+                   (currentPlayer === 'black' && piece === piece.toLowerCase());
+        }
+
+        // Select a piece
+        function selectPiece(row, col) {
+            selectedPiece = boardState[row][col];
+            selectedPosition = [row, col];
+            renderBoard();
+        }
+
+        // Move the selected piece
+        function movePiece(row, col) {
+            if (selectedPiece && isValidMove(row, col)) {
+                const capturedPiece = boardState[row][col];
+                boardState[selectedPosition[0]][selectedPosition[1]] = null;
+                boardState[row][col] = selectedPiece;
+                selectedPiece = null;
+                selectedPosition = null;
+                currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                renderBoard();
+            }
+        }
+
+        // Check if the move is valid for the selected piece
+        function isValidMove(row, col) {
+            const [currentRow, currentCol] = selectedPosition;
+            const piece = selectedPiece;
+
+            if (piece.toLowerCase() === 'p') { // Pawn movement
+                const direction = piece === 'P' ? 1 : -1;  // White moves down, Black moves up
+                const startRow = piece === 'P' ? 6 : 1;
+
+                if (col === currentCol && boardState[row][col] === null) {
+                    // Move forward one space
+                    if (row === currentRow + direction) return true;
+                    // Move forward two spaces on first move
+                    if (currentRow === startRow && row === currentRow + 2 * direction && boardState[currentRow + direction][col] === null) return true;
+                }
+                // Capture diagonally
+                if (Math.abs(col - currentCol) === 1 && row === currentRow + direction && boardState[row][col] !== null) return true;
+            }
+
+            if (piece.toLowerCase() === 'n') { // Knight movement
+                const rowDiff = Math.abs(row - currentRow);
+                const colDiff = Math.abs(col - currentCol);
+                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+            }
+
+            if (piece.toLowerCase() === 'r') { // Rook movement
+                if (row === currentRow) { // Horizontal movement
+                    const step = col > currentCol ? 1 : -1;
+                    for (let i = currentCol + step; i !== col; i += step) {
+                        if (boardState[row][i] !== null) return false;
+                    }
+                    return true;
+                }
+                if (col === currentCol) { // Vertical movement
+                    const step = row > currentRow ? 1 : -1;
+                    for (let i = currentRow + step; i !== row; i += step) {
+                        if (boardState[i][col] !== null) return false;
+                    }
+                    return true;
+                }
+            }
+
+            if (piece.toLowerCase() === 'b') { // Bishop movement
+                const rowDiff = Math.abs(row - currentRow);
+                const colDiff = Math.abs(col - currentCol);
+                if (rowDiff === colDiff) {
+                    const rowStep = row > currentRow ? 1 : -1;
+                    const colStep = col > currentCol ? 1 : -1;
+                    for (let i = 1; i < rowDiff; i++) {
+                        if (boardState[currentRow + i * rowStep][currentCol + i * colStep] !== null) return false;
+                    }
+                    return true;
+                }
+            }
+
+            if (piece.toLowerCase() === 'q') { // Queen movement
+                return isValidMove(row, col); // Queen combines Rook and Bishop movement
+            }
+
+            if (piece.toLowerCase() === 'k') { // King movement
+                const rowDiff = Math.abs(row - currentRow);
+                const colDiff = Math.abs(col - currentCol);
+                return rowDiff <= 1 && colDiff <= 1;
+            }
+
+            return false;
+        }
+
+        // Initialize board
+        function initializeBoard() {
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    boardState[i][j] = initialSetup[i][j];
+                }
+            }
+            renderBoard();
+        }
+
+        initializeBoard();
+    </script>
+</body>
+</html>
